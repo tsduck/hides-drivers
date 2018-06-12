@@ -1,0 +1,12 @@
+Package: hides-dkms
+Version: {{VERSION}}
+Architecture: all
+Maintainer: ITE Technologies Inc.
+Section: free/kernel
+Priority: optional
+Depends: dkms
+Description: Source code and DKMS setup for the HiDes device drivers.
+ This package installs the source code and DKMS setup for the kernel modules
+ of the HiDes device drivers. Each time the kernel is upgraded, the HiDes
+ modules are automatically recompiled. The driver is provided by ITE
+ Technologies Inc. for IT950x chipsets.

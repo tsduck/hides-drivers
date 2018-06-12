@@ -1,0 +1,11 @@
+PACKAGE_NAME=hides
+PACKAGE_VERSION={{VERSION}}
+
+MAKE="'make' KERNELDIR=/lib/modules/${kernelver}/build"
+CLEAN="make clean"
+REMAKE_INITRD=no
+AUTOINSTALL=yes
+
+BUILT_MODULE_NAME[0]=usb-it950x
+BUILT_MODULE_LOCATION[0]=it950x_driver
+DEST_MODULE_LOCATION[0]=/kernel/drivers/media

@@ -1,0 +1,8 @@
+#!/bin/bash
+# HiDes DKMS pre-uninstallation script on Ubuntu and Debian systems.
+
+if [[ "$1" = "remove" || "$1" = "deconfigure" ]]; then
+    [[ $(/usr/sbin/dkms status | grep hides | grep "{{VERSION}}" | wc -l) -gt 0 ]] && /usr/sbin/dkms remove -m hides -v "{{VERSION}}" --all
+fi
+
+exit 0

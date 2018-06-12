@@ -1,0 +1,7 @@
+# Makefile for HiDes drivers version {{VERSION}} DKMS.
+
+default:
+	$(MAKE) -C it950x_driver
+
+clean:
+	find . \( -name '.*.o.cmd' -o -name '.*.ko.cmd' -o -name '*.mod.c' -o -name '*.o' -o -name '.*.d' -o -name '*.ko' -o -name '.tmp_versions' -o -name 'modules.order' -o -name 'Module.symvers' -o -name '.cache.mk' \) -print0 | xargs -0 rm -rf

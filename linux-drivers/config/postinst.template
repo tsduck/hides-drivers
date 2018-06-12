@@ -1,0 +1,16 @@
+#!/bin/bash
+# HiDes device driver post-installation script on Ubuntu and Debian systems.
+
+if [[ "$1" = "configure" ]]; then
+    # Fix file permissions and ownership.
+    chown -R root:root /usr/src/hides-{{VERSION}} /etc/udev/rules.d/51-dta.rules /etc/udev/rules.d/51-dtu.rules /usr/share/doc/hides-dkms
+    find /usr/src/hides-{{VERSION}} -type f -print0 | xargs -0 chmod 644
+    find /usr/src/hides-{{VERSION}} -type d -print0 | xargs -0 chmod 755
+
+    # Build the initial version of the driver.
+    [[ $(/usr/sbin/dkms status | grep hides | grep "{{VERSION}}" | wc -l) -eq 0 ]] && /usr/sbin/dkms add -m hides -v "{{VERSION}}"
+    /usr/sbin/dkms build -m hides -v "{{VERSION}}"
+    /usr/sbin/dkms install -m hides -v "{{VERSION}}" --force
+fi
+
+exit 0
