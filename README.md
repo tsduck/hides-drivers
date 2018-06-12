@@ -1,4 +1,4 @@
-## Device drivers and SDK for HiDes UT-100C DVB-T Modulator
+## Device drivers for HiDes UT-100C DVB-T Modulator
 
 ### About HiDes devices
 
@@ -14,7 +14,8 @@ The associated software, as currently delivered by HiDes, supports Windows
 and Linux. It is currently unclear who actually developed this software,
 HiDes or ITE. However, it is poorly packaged, especially the Linux drivers and
 the application SDK. The software delivery mostly consists in a set of
-disorganized zip archives on DropBox, without fixed referenced URL.
+disorganized zip archives on DropBox, without fixed URL to reference
+in order to get notified of updates.
 
 This project proposes an integrated packaging of the drivers for HiDes devices
 on Linux and Windows. When the original packaging is acceptable (as it is for
