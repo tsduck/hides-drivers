@@ -3,7 +3,7 @@
 
 if [[ "$1" = "configure" ]]; then
     # Fix file permissions and ownership.
-    chown -R root:root /usr/src/hides-{{VERSION}} /etc/udev/rules.d/51-dta.rules /etc/udev/rules.d/51-dtu.rules /usr/share/doc/hides-dkms
+    chown -R root:root /usr/src/hides-{{VERSION}}
     find /usr/src/hides-{{VERSION}} -type f -print0 | xargs -0 chmod 644
     find /usr/src/hides-{{VERSION}} -type d -print0 | xargs -0 chmod 755
 
