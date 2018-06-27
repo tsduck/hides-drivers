@@ -35,8 +35,9 @@ sed -e "s/{{VERSION}}/$VERSION/g" "$ROOTDIR/config/dkms.conf.template" >"$DKMS_D
 sed -e "s/{{VERSION}}/$VERSION/g" "$ROOTDIR/config/Makefile.template" >"$DKMS_DIR/Makefile"
 cp -r "$ROOTDIR/it950x_driver" "$DKMS_DIR"
 make -C "$DKMS_DIR" --no-print-directory --silent clean
-find "$DKMS_DIR" -type f -print0 | xargs -0 chmod 644
-find "$DKMS_DIR" -type d -print0 | xargs -0 chmod 755
+cp "$ROOTDIR/60-hides.rules" "$ROOTDIR/60-hides.perms" "$SRCDIR"
+find "$SRCDIR" -type f -print0 | xargs -0 chmod 644
+find "$SRCDIR" -type d -print0 | xargs -0 chmod 755
 
 # Build a source tarball for the hides-dkms package.
 mkdir -p "$PKGDIR" || cleanexit 1
@@ -105,12 +106,14 @@ if $DEB_DISTRO; then
     rm -rf "$DEBDIR"
 
     # Build file structure of the package.
-    mkdir -p -m 0755 "$DEBDIR/DEBIAN" "$DEBDIR/usr/src"
+    mkdir -p -m 0755 "$DEBDIR/DEBIAN" "$DEBDIR/usr/src" "$DEBDIR/etc/udev/rules.d" "$DEBDIR/etc/security/console.perms.d"
     for f in control postinst prerm; do
         sed -e "s/{{VERSION}}/$VERSION/g" "$ROOTDIR/config/$f.template" >"$DEBDIR/DEBIAN/$f"
     done
     chmod 755 "$DEBDIR/DEBIAN/postinst" "$DEBDIR/DEBIAN/prerm"
     cp -rp "$SRCDIR/hides-$VERSION" "$DEBDIR/usr/src"
+    install -m 644 "$SRCDIR/60-hides.rules" "$DEBDIR/etc/udev/rules.d"
+    install -m 644 "$SRCDIR/60-hides.perms" "$DEBDIR/etc/security/console.perms.d"
 
     # Build the binary package
     dpkg --build "$DEBDIR" "$PKGDIR"

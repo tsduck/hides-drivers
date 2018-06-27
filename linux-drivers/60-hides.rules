@@ -1,0 +1,2 @@
+# udev rules for hides devices
+KERNEL=="usb-it950x*", GROUP="video", MODE="0660"

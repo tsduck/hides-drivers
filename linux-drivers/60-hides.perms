@@ -1,0 +1,3 @@
+# security settings for hides devices
+<hides>=/dev/usb-it950x*
+<console> 0600 <hides> 0660 root.video

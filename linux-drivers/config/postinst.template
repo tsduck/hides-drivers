@@ -3,9 +3,10 @@
 
 if [[ "$1" = "configure" ]]; then
     # Fix file permissions and ownership.
-    chown -R root:root /usr/src/hides-{{VERSION}}
+    chown -R root:root /usr/src/hides-{{VERSION}} /etc/udev/rules.d/60-hides.rules /etc/security/console.perms.d/60-hides.perms
     find /usr/src/hides-{{VERSION}} -type f -print0 | xargs -0 chmod 644
     find /usr/src/hides-{{VERSION}} -type d -print0 | xargs -0 chmod 755
+    chmod 644 /etc/udev/rules.d/60-hides.rules /etc/security/console.perms.d/60-hides.perms
 
     # Build the initial version of the driver.
     [[ $(/usr/sbin/dkms status | grep hides | grep "{{VERSION}}" | wc -l) -eq 0 ]] && /usr/sbin/dkms add -m hides -v "{{VERSION}}"

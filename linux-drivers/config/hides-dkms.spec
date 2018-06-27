@@ -26,8 +26,10 @@ by ITE Technologies Inc. for IT950x chipsets.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/usr/src
+mkdir -p $RPM_BUILD_ROOT/usr/src $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d $RPM_BUILD_ROOT%{_sysconfdir}/security/console.perms.d
 cp -r hides-%{version} $RPM_BUILD_ROOT/usr/src
+install -m 644 60-hides.rules $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d
+install -m 644 60-hides.perms $RPM_BUILD_ROOT%{_sysconfdir}/security/console.perms.d
 
 %post
 [[ $(/usr/sbin/dkms status | grep hides | grep "%{version}" | wc -l) -eq 0 ]] && /usr/sbin/dkms add -m hides -v "%{version}"
@@ -45,3 +47,5 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 /usr/src/hides-%{version}
+%{_sysconfdir}/udev/rules.d/60-hides.rules
+%{_sysconfdir}/security/console.perms.d/60-hides.perms
