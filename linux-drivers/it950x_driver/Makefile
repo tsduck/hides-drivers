@@ -15,7 +15,7 @@ $(module)-objs := \
 obj-m += $(module).o  
 
 default:
-	make -s -C $(KERNELDIR) SUBDIRS=$(PWD) modules
+	$(MAKE) -C $(KERNELDIR) SUBDIRS=$(PWD) modules
 
 EXTRA_CFLAGS += -DEXPORT_SYMTAB -Wno-unused-value -Wno-unused-variable -Wno-unused-parameter -Wno-switch 
 

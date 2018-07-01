@@ -47,6 +47,10 @@ Dword Tx_RMRingBuffer(struct it950x_urb_context *context, Dword dwDataFrameSize)
 	spin_unlock_irqrestore(&dev->TxRBKeyLock, flags);
 
 	dev->tx_urbstatus[context->index] = 0;
+
+#ifdef TSDUCK_WRITE
+	wake_up_interruptible(&dev->tx_urb_wait);
+#endif
 	return 0;
 }
 
@@ -224,6 +228,10 @@ static int tx_stop_urb_transfer(struct it950x_dev *dev)
 	dev->tx_urb_streaming = 0;
 	dev->tx_urb_streaming_low_brate = 0;
 	
+#ifdef TSDUCK_WRITE
+        /* make sure that processes waiting for buffer are resumed */
+	wake_up_interruptible(&dev->tx_urb_wait);
+#endif
 
 	//memset(dev->pTxRingBuffer, 0, get_order(dev->dwTxWriteTolBufferSize));
 	if(!dev->pTxRingBuffer) {
@@ -1833,6 +1841,21 @@ static ssize_t it950x_read(
 
 }
 
+#ifdef TSDUCK_WRITE
+static ssize_t it950x_tx_write_try(
+	struct it950x_dev *dev,
+	const char __user *user_buffer,
+	Dword* Len,
+	unsigned long flags)
+{
+	DWORD dwError = Error_NO_ERROR;
+	spin_lock_irqsave(&dev->TxRBKeyLock, flags);
+	dwError = Tx_RingBuffer(dev, (Byte*)user_buffer, Len);
+	spin_unlock_irqrestore(&dev->TxRBKeyLock, flags);
+	return dwError;
+}
+#endif
+
 static ssize_t it950x_tx_write(
 	struct file *file,
 	const char __user *user_buffer,
@@ -1850,9 +1873,18 @@ static ssize_t it950x_tx_write(
 	if (dev == NULL)
 		return -ENODEV;
 
+#ifdef TSDUCK_WRITE
+        if (Len > dev->dwTxWriteTolBufferSize) {
+            /* larger than urbn will never work */
+            return Error_BUFFER_INSUFFICIENT;
+        }
+        /* wait and retry until buffer available (or other error) */
+        wait_event_interruptible(dev->tx_urb_wait, (dwError = it950x_tx_write_try(dev, user_buffer, &Len, flags)) != Error_BUFFER_INSUFFICIENT);
+#else
 	spin_lock_irqsave(&dev->TxRBKeyLock, flags);
 	dwError = Tx_RingBuffer(dev, (Byte*)user_buffer, &Len);
 	spin_unlock_irqrestore(&dev->TxRBKeyLock, flags);
+#endif
 	return dwError;
 	//deb_data("[%lu]\n", Len);
 //	if(dwError != 0) return dwError;
@@ -2067,6 +2099,11 @@ static int it950x_probe(struct usb_interface *intf, const struct usb_device_id *
 	}
 	dev->tx_chip_minor = intf->minor;
 	deb_data("tx minor %d \n", dev->tx_chip_minor);
+
+        /* TSDuck patch, write(2) blocks until enough buffer is available */
+#ifdef TSDUCK_WRITE
+	init_waitqueue_head(&dev->tx_urb_wait);
+#endif
 
 	/* Allocate Write Ring buffer */
 	dev->dwTxWriteTolBufferSize = URB_BUFSIZE_TX * URB_COUNT_TX;

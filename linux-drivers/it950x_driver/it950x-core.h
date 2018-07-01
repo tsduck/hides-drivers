@@ -39,7 +39,12 @@
 #include <linux/smp_lock.h>
 #endif
 
+#ifdef TSDUCK_WRITE
+/* Add "w" for "wait" at end of version */
+#define   DRIVER_RELEASE_VERSION    "v16.11.10.1w"
+#else
 #define   DRIVER_RELEASE_VERSION    "v16.11.10.1"
+#endif
 
 /** Device Power control for DTVCAM, AVSENDER ,OTHER **/
 #define DEVICE_POWER_CTRL 1			// 0: PW Control OFF
@@ -368,6 +373,11 @@ struct it950x_dev {
 	struct task_struct *reset_thread;
 	wait_queue_head_t reset_wait;
 	Byte disconnect;	
+#endif
+
+        /* TSDuck patch, write(2) blocks until enough buffer is available */
+#ifdef TSDUCK_WRITE
+	wait_queue_head_t tx_urb_wait;
 #endif
 };
 

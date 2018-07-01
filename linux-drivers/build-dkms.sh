@@ -14,7 +14,7 @@ error() { echo >&2 "$SCRIPT: $*"; cleanexit 1; }
 trap cleanexit SIGINT
 
 # Package version from a text file here.
-VERSION=$(cat "$ROOTDIR/VERSION")
+VERSION=$(grep -m1 DRIVER_RELEASE_VERSION "$ROOTDIR/it950x_driver/it950x-core.h" | sed -e 's/^[^"]*"[^0-9]*//' -e 's/".*$//')
 verbose "building version $VERSION"
 
 # Target installation directory for DKMS.
