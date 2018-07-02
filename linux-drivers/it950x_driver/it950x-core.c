@@ -1845,12 +1845,13 @@ static ssize_t it950x_read(
 static ssize_t it950x_tx_write_try(
 	struct it950x_dev *dev,
 	const char __user *user_buffer,
-	Dword* Len,
+	size_t count,
 	unsigned long flags)
 {
+	Dword Len = count;
 	DWORD dwError = Error_NO_ERROR;
 	spin_lock_irqsave(&dev->TxRBKeyLock, flags);
-	dwError = Tx_RingBuffer(dev, (Byte*)user_buffer, Len);
+	dwError = Tx_RingBuffer(dev, (Byte*)user_buffer, &Len);
 	spin_unlock_irqrestore(&dev->TxRBKeyLock, flags);
 	return dwError;
 }
@@ -1879,7 +1880,7 @@ static ssize_t it950x_tx_write(
             return Error_BUFFER_INSUFFICIENT;
         }
         /* wait and retry until buffer available (or other error) */
-        wait_event_interruptible(dev->tx_urb_wait, (dwError = it950x_tx_write_try(dev, user_buffer, &Len, flags)) != Error_BUFFER_INSUFFICIENT);
+        wait_event_interruptible(dev->tx_urb_wait, (dwError = it950x_tx_write_try(dev, user_buffer, count, flags)) != Error_BUFFER_INSUFFICIENT);
 #else
 	spin_lock_irqsave(&dev->TxRBKeyLock, flags);
 	dwError = Tx_RingBuffer(dev, (Byte*)user_buffer, &Len);
