@@ -12,22 +12,65 @@ Other models include reception or PCIe interface.
 
 The associated software, as currently delivered by HiDes, supports Windows
 and Linux. It is currently unclear who actually developed this software,
-HiDes or ITE. However, it is poorly packaged, especially the Linux drivers and
-the application SDK. The software delivery mostly consists in a set of
-disorganized zip archives on DropBox, without fixed URL to reference
+HiDes or ITE. 
+
+The software is poorly packaged and its delivery mostly consists in a
+set of disorganized zip archives on DropBox, without fixed URL to reference
 in order to get notified of updates.
 
+### About this project
+
 This project proposes an integrated packaging of the drivers for HiDes devices
-on Linux and Windows. When the original packaging is acceptable (as it is for
-the Windows drivers, for instance), no change was made. For Linux drivers,
-a DKMS (Dynamic Kernel Module Support) package is provided.
+on Linux and Windows.
 
 The latest repackaged drivers are available [here](https://github.com/tsduck/hides-drivers/releases/latest).
 
-The provided SDK, however, is hopeless. The API definition is not even the same
-between Linux and Windows. An alternate portable HiDes API will be provided as
-part of [TSDuck](https://github.com/tsduck/tsduck/), based on the original
-HiDes / ITE drivers.
+Synthetic links to the latest versions are also available from the
+[TSDuck site](https://tsduck.io/download/hides/).
+
+#### Windows drivers
+
+The original packaging for the Windows driver for HiDes devices is acceptable.
+No change was made. This project only provides a fixed and known place from
+where the latest version can be downloaded.
+
+#### Linux drivers
+
+The original Linux driver has two problems:
+- It is delivered in source form only, in the middle of an archive containing
+sample test code and other software.
+- It has a _polling_ design for send operations. A "normal" device driver for
+output device implements "waiting" or "blocking" send operations.
+
+To solve the first issue, a DKMS (Dynamic Kernel Module Support) package is
+provided in this project. Install the DMKS package (available in `.rpm` or
+`.deb` form) and the driver is automatically recompiled and reinstalled after
+each kernel upgrade.
+
+To solve the second issue, the Linux driver was modified to make all `write`
+operations waiting for the device to be ready. Thus, applications do not
+have to implement polling.
+
+Note that the modified driver remains otherwise compatible with the original
+one. Thus, applications which were developed for the original driver will
+continue to work. But their polling code will never be used since all `write`
+calls always succeed the first time (except in case of _real_ errors of course).
+
+To let applications checking if the driver needs polling or not, the version
+string of the new driver ends with a `'w'` letter.
+
+#### API and SDK
+
+The original SDK is hopeless. The API definition is not even the same between
+Linux and Windows. It is not possible to write portable applications using
+the original SDK. Moreover, the Linux version of the SDK exhibits blatant
+memory leaks in its so-called "API". Using the original SDK is consequently
+discouraged.
+
+An alternate portable HiDes API is provided as part of [TSDuck](https://github.com/tsduck/tsduck/).
+This API is the C++ class [HiDesDevice](https://github.com/tsduck/tsduck/blob/master/src/libtsduck/tsHiDesDevice.h).
+The interface of this class is system-agnostic. Its implementation directly
+calls the underlying device driver but hides the differences between operating systems.
 
 ### Reference links
 
