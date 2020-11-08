@@ -41,7 +41,7 @@
 
 #ifdef TSDUCK_WRITE
 /* Add "w" for "wait" at end of version */
-#define   DRIVER_RELEASE_VERSION    "v16.11.10.1w"
+#define   DRIVER_RELEASE_VERSION    "v16.11.10.1w.1"
 #else
 #define   DRIVER_RELEASE_VERSION    "v16.11.10.1"
 #endif

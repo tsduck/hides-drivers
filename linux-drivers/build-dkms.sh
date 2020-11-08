@@ -66,7 +66,7 @@ elif [[ -n "$UB_DISTRO" ]]; then
     DISTRO_VERSION="$UB_DISTRO"
     DEB_DISTRO=true
 elif [[ -n "$DB_DISTRO" ]]; then
-    DISTRO_VERSION="$DEB_DISTRO"
+    DISTRO_VERSION="$DB_DISTRO"
     DEB_DISTRO=true
 fi
 DISTRO="$DISTRO_PREFIX"$(sed <<<"$DISTRO_VERSION" -e 's/\..*//')

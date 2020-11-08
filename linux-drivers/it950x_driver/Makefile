@@ -3,8 +3,11 @@ module=usb-it950x
 PWD = $(shell pwd)
 MACHINE = $(shell uname -m)
 CURRENT = $(shell uname -r)
-KERNELDIR = /lib/modules/$(CURRENT)/build
 INSTALLDIR := /lib/modules/$(CURRENT)/kernel/drivers/media
+
+ifndef KERNELDIR
+    KERNELDIR = /lib/modules/$(CURRENT)/build
+endif
 
 $(module)-objs := \
 		it950x-core.o it950x-drv.o iocontrol.o  \
@@ -15,7 +18,7 @@ $(module)-objs := \
 obj-m += $(module).o  
 
 default:
-	$(MAKE) -C $(KERNELDIR) SUBDIRS=$(PWD) modules
+	$(MAKE) MYPWD=$(PWD) -C $(KERNELDIR) M=$(PWD) modules
 
 EXTRA_CFLAGS += -DEXPORT_SYMTAB -Wno-unused-value -Wno-unused-variable -Wno-unused-parameter -Wno-switch 
 
