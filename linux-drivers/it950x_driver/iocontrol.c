@@ -631,7 +631,8 @@ DWORD DemodIOCTLFun(
 				return -EFAULT;
 
 			pbufferAddrUser = (Byte*) Request.pbufferAddr;
-			copy_from_user(pbufferAddrKernel, pbufferAddrUser, 188);
+			if (copy_from_user(pbufferAddrKernel, pbufferAddrUser, 188))
+				return -EFAULT;
 			Request.error = IT9507_accessFwPSITable((Modulator*) handle, Request.psiTableIndex, (Byte*) pbufferAddrKernel);	
 																													                       			
 			if (copy_to_user((void *)pIOBuffer, (void *)&Request, sizeof(TxAccessFwPSITableRequest)))
@@ -642,7 +643,8 @@ DWORD DemodIOCTLFun(
 			Byte* pbufferAddrUser = (Byte*) pRequest->pbufferAddr;
 			Byte pbufferAddrKernel[188];
 
-			copy_from_user(pbufferAddrKernel, pbufferAddrUser, 188);					
+			if (copy_from_user(pbufferAddrKernel, pbufferAddrUser, 188))
+				return -EFAULT;
 			pRequest->error = IT9507_accessFwPSITable ((Modulator*) handle, pRequest->psiTableIndex, (Byte*) pbufferAddrKernel);*/
 			break;
 		}		

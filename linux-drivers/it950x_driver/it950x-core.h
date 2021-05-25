@@ -21,8 +21,8 @@
 #include <linux/usb.h>
 #include <linux/fs.h>
 #include <linux/file.h>
-#include <linux/uaccess.h>
 #include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include "iocontrol.h"
 #include "IT9133.h"
 #include "IT9507.h"
@@ -41,9 +41,9 @@
 
 #ifdef TSDUCK_WRITE
 /* Add "w" for "wait" at end of version */
-#define   DRIVER_RELEASE_VERSION    "v16.11.10.1w.1"
+#define   DRIVER_RELEASE_VERSION    "v18.04.16.1w"
 #else
-#define   DRIVER_RELEASE_VERSION    "v16.11.10.1"
+#define   DRIVER_RELEASE_VERSION    "v18.04.16.1"
 #endif
 
 /** Device Power control for DTVCAM, AVSENDER ,OTHER **/

@@ -379,19 +379,23 @@ DWORD Tx_RingBuffer(
 		dwBuffLen = dev->dwTxWriteTolBufferSize - dwWriteBuffAddr;
 		if (dwBuffLen >= dwCpBuffLen) {
 //			memcpy(dev->pTxRingBuffer + dwWriteBuffAddr, pBuffer, dwCpBuffLen);
-			copy_from_user(dev->pTxRingBuffer + dwWriteBuffAddr, pBuffer, dwCpBuffLen);
+			if (copy_from_user(dev->pTxRingBuffer + dwWriteBuffAddr, pBuffer, dwCpBuffLen))
+				return -EFAULT;
 		}
 		else {
 //			memcpy(dev->pTxRingBuffer + dwWriteBuffAddr, pBuffer, dwBuffLen);
 //			memcpy(dev->pTxRingBuffer, pBuffer + dwBuffLen, dwCpBuffLen - dwBuffLen);
-			copy_from_user(dev->pTxRingBuffer + dwWriteBuffAddr, pBuffer, dwBuffLen);
-			copy_from_user(dev->pTxRingBuffer, pBuffer + dwBuffLen, dwCpBuffLen - dwBuffLen);
+			if (copy_from_user(dev->pTxRingBuffer + dwWriteBuffAddr, pBuffer, dwBuffLen))
+				return -EFAULT;
+			if (copy_from_user(dev->pTxRingBuffer, pBuffer + dwBuffLen, dwCpBuffLen - dwBuffLen))
+				return -EFAULT;
 		}
 	}
 	else {
 		/* To_kernel_urb run a cycle and Return_urb not */
 //		memcpy(dev->pTxRingBuffer + dwWriteBuffAddr, pBuffer, dwCpBuffLen);
-		copy_from_user(dev->pTxRingBuffer + dwWriteBuffAddr, pBuffer, dwCpBuffLen);
+		if (copy_from_user(dev->pTxRingBuffer + dwWriteBuffAddr, pBuffer, dwCpBuffLen))
+			return -EFAULT;
 	}
 
 	dev->TxWriteBuffPointAddr = (dev->TxWriteBuffPointAddr + dwCpBuffLen) % (dev->dwTxWriteTolBufferSize);
@@ -523,18 +527,22 @@ DWORD Tx_RingBuffer_low_brate(
 		dwBuffLen = dev->dwTxWriteTolBufferSize_low_brate - dwWriteBuffAddr;
 		if (dwBuffLen >= dwCpBuffLen) {
 //			memcpy(dev->pTxRingBuffer_low_brate + dwWriteBuffAddr, pBuffer, dwCpBuffLen);
-			copy_from_user(dev->pTxRingBuffer_low_brate + dwWriteBuffAddr, pBuffer, dwCpBuffLen);
+			if (copy_from_user(dev->pTxRingBuffer_low_brate + dwWriteBuffAddr, pBuffer, dwCpBuffLen))
+				return -EFAULT;
 		}
 		else {
 //			memcpy(dev->pTxRingBuffer_low_brate + dwWriteBuffAddr, pBuffer, dwBuffLen);
-			copy_from_user(dev->pTxRingBuffer_low_brate + dwWriteBuffAddr, pBuffer, dwBuffLen);
+			if (copy_from_user(dev->pTxRingBuffer_low_brate + dwWriteBuffAddr, pBuffer, dwBuffLen))
+				return -EFAULT;
 //			memcpy(dev->pTxRingBuffer_low_brate, pBuffer + dwBuffLen, dwCpBuffLen - dwBuffLen);
-			copy_from_user(dev->pTxRingBuffer_low_brate, pBuffer + dwBuffLen, dwCpBuffLen - dwBuffLen);
+			if (copy_from_user(dev->pTxRingBuffer_low_brate, pBuffer + dwBuffLen, dwCpBuffLen - dwBuffLen))
+				return -EFAULT;
 		}
 	}
 	else {
 //		memcpy(dev->pTxRingBuffer_low_brate + dwWriteBuffAddr, pBuffer, dwCpBuffLen);
-		copy_from_user(dev->pTxRingBuffer_low_brate + dwWriteBuffAddr, pBuffer, dwCpBuffLen);
+		if (copy_from_user(dev->pTxRingBuffer_low_brate + dwWriteBuffAddr, pBuffer, dwCpBuffLen))
+			return -EFAULT;
 	}
 
 	dev->TxWriteBuffPointAddr_low_brate = (dev->TxWriteBuffPointAddr_low_brate + dwCpBuffLen) % (dev->dwTxWriteTolBufferSize_low_brate);
@@ -602,18 +610,24 @@ DWORD Tx_RingBuffer_cmd(
 		if(dwBuffLen < dwCpBuffLen)
 		{
 //			memcpy(dev->pWriteFrameBuffer_cmd+dwWriteBuffAddr, pBuffer, dwBuffLen);
-			copy_from_user(dev->pWriteFrameBuffer_cmd+dwWriteBuffAddr, pBuffer, dwBuffLen);
+			if (copy_from_user(dev->pWriteFrameBuffer_cmd+dwWriteBuffAddr, pBuffer, dwBuffLen))
+				return -EFAULT;
 //			memcpy(dev->pWriteFrameBuffer_cmd, pBuffer+dwBuffLen, dwCpBuffLen-dwBuffLen);
-			copy_from_user(dev->pWriteFrameBuffer_cmd, pBuffer+dwBuffLen, dwCpBuffLen-dwBuffLen);
+			if (copy_from_user(dev->pWriteFrameBuffer_cmd, pBuffer+dwBuffLen, dwCpBuffLen-dwBuffLen))
+				return -EFAULT;
 			RingBufferOverWrite = true;
 		}
-		else
+		else {
 //			memcpy(dev->pWriteFrameBuffer_cmd+dwWriteBuffAddr, pBuffer, dwCpBuffLen);
-			copy_from_user(dev->pWriteFrameBuffer_cmd+dwWriteBuffAddr, pBuffer, dwCpBuffLen);
+			if (copy_from_user(dev->pWriteFrameBuffer_cmd+dwWriteBuffAddr, pBuffer, dwCpBuffLen))
+				return -EFAULT;
+		}
 	}
-	else
+	else {
 //		memcpy(dev->pWriteFrameBuffer_cmd+dwWriteBuffAddr, pBuffer, dwCpBuffLen);
-		copy_from_user(dev->pWriteFrameBuffer_cmd+dwWriteBuffAddr, pBuffer, dwCpBuffLen);
+		if (copy_from_user(dev->pWriteFrameBuffer_cmd+dwWriteBuffAddr, pBuffer, dwCpBuffLen)
+				return -EFAULT;
+	}
 
 
 	*dev->pTxWriteBuffPointAddr_cmd = (*dev->pTxWriteBuffPointAddr_cmd+dwCpBuffLen) % dev->dwTxWriteTolBufferSize_cmd;
@@ -724,20 +738,24 @@ DWORD Rx_RingBuffer(
 		if(dwBuffLen >= dwCpBuffLen){
 			//end remaining memory is enough
 //			memcpy(pBuffer, dev->pRxRingBuffer + dwReadBuffAddr, dwCpBuffLen);
-			copy_to_user(pBuffer, dev->pRxRingBuffer + dwReadBuffAddr, dwCpBuffLen);
+			if (copy_to_user(pBuffer, dev->pRxRingBuffer + dwReadBuffAddr, dwCpBuffLen))
+				return -EFAULT;
 		}
 		else{
 			//use all end memory, run a cycle and need use beginning memory
 //			memcpy(pBuffer, dev->pRxRingBuffer + dwReadBuffAddr, dwBuffLen); //using end memory
-			copy_to_user(pBuffer, dev->pRxRingBuffer + dwReadBuffAddr, dwBuffLen); //using end memory
+			if (copy_to_user(pBuffer, dev->pRxRingBuffer + dwReadBuffAddr, dwBuffLen)) //using end memory
+				return -EFAULT;
 //			memcpy(pBuffer + dwBuffLen, dev->pRxRingBuffer, dwCpBuffLen - dwBuffLen); //using begining memory
-			copy_to_user(pBuffer + dwBuffLen, dev->pRxRingBuffer, dwCpBuffLen - dwBuffLen); //using begining memory
+			if (copy_to_user(pBuffer + dwBuffLen, dev->pRxRingBuffer, dwCpBuffLen - dwBuffLen)) //using begining memory
+				return -EFAULT;
 		}
 	}
 	else{
 		//Return_urb not run a cycle or both run a cycle
 //		memcpy(pBuffer, dev->pRxRingBuffer + dwReadBuffAddr, dwCpBuffLen);
-		copy_to_user(pBuffer, dev->pRxRingBuffer + dwReadBuffAddr, dwCpBuffLen);
+		if (copy_to_user(pBuffer, dev->pRxRingBuffer + dwReadBuffAddr, dwCpBuffLen))
+			return -EFAULT;
 	}
 	
 	spin_lock_irqsave(&dev->RxRBKeylock, flags);
@@ -1570,7 +1588,8 @@ static int it950x_usb_tx_ioctl(struct inode *inode, struct file *file,
 				}
 
 				pIQtableKernel = (Byte*) __get_free_pages(GFP_KERNEL, get_order(tableGroups*8+16));
-				copy_from_user(pIQtableKernel, pIQtableUser, (tableGroups*8+16));
+				if (copy_from_user(pIQtableKernel, pIQtableUser, (tableGroups*8+16)))
+					return -EFAULT;
 				if(dev->DC.calibrationInfo.tableGroups != tableGroups) {		// Reallocate table.
 					deb_data("[SETIQTable] Reallocate IQ Table.\n");
 					if(dev->DC.calibrationInfo.ptrIQtableEx) {
@@ -1754,7 +1773,8 @@ long it950x_usb_tx_unlocked_ioctl(
 				}
 
 				pIQtableKernel = (Byte*) __get_free_pages(GFP_KERNEL, get_order(tableGroups*8+16));
-				copy_from_user(pIQtableKernel, pIQtableUser, (tableGroups*8+16));
+				if (copy_from_user(pIQtableKernel, pIQtableUser, (tableGroups*8+16)))
+					return -EFAULT;
 				if(dev->DC.calibrationInfo.tableGroups != tableGroups) {		// Reallocate table.
 					deb_data("[SETIQTable] Reallocate IQ Table.\n");
 					if(dev->DC.calibrationInfo.ptrIQtableEx) {
@@ -1831,7 +1851,8 @@ static ssize_t it950x_read(
 
 		if (ret) deb_data("--------Usb2_readControlBus fail : 0x%08lx\n", ret);
 	
-		copy_to_user(buf, buffer, 256);
+		if (copy_to_user(buf, buffer, 256))
+			return -EFAULT;
 
 		for(i = 0; i < 256; i++)
 			deb_data("---------Read data buffer[%d] 0x%x\n", i, buf[i]);
@@ -1893,7 +1914,8 @@ static ssize_t it950x_tx_write(
 
 	/*AirHD Bulk Msg*/
 #if 0
-	copy_from_user(b_buf, user_buffer, count);
+	if (copy_from_user(b_buf, user_buffer, count))
+		return -EFAULT;
 
 	dwError = usb_bulk_msg(usb_get_dev(dev0->DC->modulator.userData),
 			usb_sndbulkpipe(usb_get_dev(dev0->DC->modulator.userData), 0x06),

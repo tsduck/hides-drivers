@@ -4,6 +4,7 @@
 #include "firmware_V2.h"
 #include "firmware_V2I.h"
 #include "IQ_fixed_table.h"
+#include <linux/firmware.h>
 
 #define OMEGAI_RX_LNA_TUNER_ID_SUPPORT_TYPE	OMEGA_NORMAL			/* no support RX Decryption. Set default tuner id for 0x38 */
 #define OMEGAII_RX_LNA_TUNER_ID_SUPPORT_TYPE	OMEGA_LNA_Config_5	/* RX Decryption. Set tuner id for 0x65 */
@@ -72,6 +73,9 @@ static DWORD DRV_IrTblDownload(IN void* handle)
 {
         DWORD dwError = Error_NO_ERROR;
         PDEVICE_CONTEXT pdc = (PDEVICE_CONTEXT)handle;
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,10,0)
+
         struct file *filp;
         unsigned char b_buf[512] ;
         int i, fileSize;
@@ -92,25 +96,26 @@ static DWORD DRV_IrTblDownload(IN void* handle)
         filp->f_pos=0x00;
         fileSize = filp->f_op->read(filp,b_buf,sizeof(b_buf),&filp->f_pos);
 
-        for(i=0; i<fileSize; i++)
-        {
-              //deb_data("\n Data %d",i); //
-              //deb_data("0x%x",b_buf[i]);//
-              // dwError = Af901xWriteReg(ucDemod2WireAddr, 0, MERC_IR_TABLE_BASE_ADDR + i, b_buf[i]);
-              //if (dwError) goto exit;
-        }
-
         dwError = IT9507_loadIrTable((Modulator*) &pdc->modulator, (Word)fileSize, b_buf);
-        if (dwError) {deb_data("Modulator_loadIrTable fail"); goto exit;}
-
+        if (dwError) {deb_data("Modulator_loadIrTable fail");}
+exit:
         filp_close(filp, NULL);
         set_fs(oldfs);
 
-exit:
-		deb_data("LoadIrTable fail!\n");
+#else
+
+        struct usb_device *udev = (struct usb_device*)pdc->modulator.userData;
+        const struct firmware *fp = 0;
+        dwError = request_firmware_direct(&fp, "af35irtbl.bin", &udev->dev);
+        if (dwError == 0) {
+                dwError = IT9507_loadIrTable((Modulator*) &pdc->modulator, (Word)fp->size, (Byte*)fp->data);
+                if (dwError) {deb_data("Modulator_loadIrTable fail");}
+                release_firmware(fp);
+        }
+
+#endif
+
         return (dwError);
-
-
 }
 
 /*
@@ -2631,6 +2636,7 @@ DWORD Device_init(struct usb_device *udev, PDEVICE_CONTEXT PDC, Bool bBoot)
 	
 	if (PDC->bIrTblDownload) 
     	{
+                PDC->modulator.userData = (void *)udev;
         	error = DL_IrTblDownload(PDC);
        	 	if (error) {deb_data("DL_IrTblDownload fail");errcount++;}
     	}

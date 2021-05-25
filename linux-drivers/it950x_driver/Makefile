@@ -36,6 +36,6 @@ remove: 16.11.10.1.
 	/sbin/modprobe -r $(module)
 
 clean:
-	@-rm -rf .tmp_versions *~ *.o *.ko .*.o.cmd .*.ko.cmd *.mod.c .cache.mk modules.order Module.markers Module.symvers
+	@-rm -rf .tmp_versions *~ *.o *.ko .*.cmd *.mod *.mod.c .cache.mk modules.order Module.markers Module.symvers
 
 -include $(KERNELDIR)/Rules.make
