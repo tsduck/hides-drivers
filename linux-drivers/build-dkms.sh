@@ -46,8 +46,8 @@ verbose "creating $SRCTARBALL"
 tar czp -f "$SRCTARBALL" -C "$TMPDIR" --owner=0 --group=0 "hides-dkms-$VERSION"
 
 # Determine operating system type and version.
-FC_DISTRO=$(grep " release " /etc/fedora-release 2>/dev/null | sed -e 's/^.* release \([0-9\.]*\) .*$/\1/')
-RH_DISTRO=$(grep " release " /etc/redhat-release 2>/dev/null | sed -e 's/^.* release \([0-9\.]*\) .*$/\1/')
+FC_DISTRO=$(grep " release [0-9]" /etc/fedora-release 2>/dev/null | sed -e 's/^.* release \([0-9]*\).*$/\1/')
+RH_DISTRO=$(grep " release [0-9]" /etc/redhat-release 2>/dev/null | sed -e 's/^.* release \([0-9]*\).*$/\1/')
 UB_DISTRO=$([[ -f /etc/lsb-release ]] && source /etc/lsb-release 2>/dev/null && [[ "`tr A-Z a-z <<<$DISTRIB_ID`" = ubuntu ]] && echo $DISTRIB_RELEASE)
 DB_DISTRO=$(head -1 /etc/debian_version 2>/dev/null)
 DISTRO_PREFIX=
