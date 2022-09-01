@@ -4,7 +4,7 @@ Architecture: all
 Maintainer: ITE Technologies Inc.
 Section: free/kernel
 Priority: optional
-Depends: dkms, libelf-dev, raspberrypi-kernel-headers | linux-headers | linux-kernel-headers
+Depends: dkms, libelf-dev, raspberrypi-kernel-headers | linux-headers | linux-kernel-headers | linux-headers-amd64
 Description: Source code and DKMS setup for the HiDes device drivers.
  This package installs the source code and DKMS setup for the kernel modules
  of the HiDes device drivers. Each time the kernel is upgraded, the HiDes
