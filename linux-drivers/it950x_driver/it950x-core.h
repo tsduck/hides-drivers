@@ -41,9 +41,9 @@
 
 #ifdef TSDUCK_WRITE
 /* Add "w" for "wait" at end of version */
-#define   DRIVER_RELEASE_VERSION    "v18.04.16.1w"
+#define   DRIVER_RELEASE_VERSION    "v18.04.16.2w"
 #else
-#define   DRIVER_RELEASE_VERSION    "v18.04.16.1"
+#define   DRIVER_RELEASE_VERSION    "v18.04.16.2"
 #endif
 
 /** Device Power control for DTVCAM, AVSENDER ,OTHER **/
