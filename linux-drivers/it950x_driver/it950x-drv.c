@@ -75,7 +75,9 @@ static DWORD DRV_IrTblDownload(IN void* handle)
         struct file *filp;
         unsigned char b_buf[512] ;
         int i, fileSize;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,18,0)
         mm_segment_t oldfs;
+#endif
 
         deb_data("- Enter %s Function -\n",__FUNCTION__);
 
@@ -85,7 +87,7 @@ static DWORD DRV_IrTblDownload(IN void* handle)
 #elif LINUX_VERSION_CODE < KERNEL_VERSION(5,10,0)
 		oldfs = get_fs();
 		set_fs(KERNEL_DS);
-#else
+#elif LINUX_VERSION_CODE < KERNEL_VERSION(5,18,0)
 		oldfs = force_uaccess_begin();
 #endif
 
@@ -113,7 +115,7 @@ static DWORD DRV_IrTblDownload(IN void* handle)
         filp_close(filp, NULL);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,10,0)
 		set_fs(oldfs);
-#else
+#elif LINUX_VERSION_CODE < KERNEL_VERSION(5,18,0)
 		force_uaccess_end(oldfs);
 #endif
 
